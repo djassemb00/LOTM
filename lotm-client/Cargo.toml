@@ -21,3 +21,5 @@ tracing-subscriber = { workspace = true }
 serde = { workspace = true }
 vek = { workspace = true }
 glam = { workspace = true }
+anyhow = { workspace = true }
+rand = { workspace = true }

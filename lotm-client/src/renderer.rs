@@ -12,7 +12,7 @@ pub struct Renderer {
 
 impl Renderer {
     pub async fn new(window: &winit::window::Window) -> anyhow::Result<Self> {
-        let instance = Instance::default();
+        let instance = Instance::new(&InstanceDescriptor::default());
 
         let surface = instance.create_surface(window.clone())?;
 
@@ -36,7 +36,9 @@ impl Renderer {
             )
             .await?;
 
-        let config = surface.get_default_config(&adapter, window.inner_size().width, window.inner_size().height)
+        let size = window.inner_size();
+        let config = surface
+            .get_default_config(&adapter, size.width, size.height)
             .ok_or_else(|| anyhow::anyhow!("Surface not supported"))?;
 
         surface.configure(&device, &config);

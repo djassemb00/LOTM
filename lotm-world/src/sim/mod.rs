@@ -310,8 +310,7 @@ impl WorldSim {
         T: std::ops::Add<Output = T>
             + std::ops::Mul<f32, Output = T>
             + Copy
-            + Default
-            + num_traits::Float,
+            + Default,
     {
         let chunk_size = lotm_common::types::Chunk::SIZE as i32;
         let chunk_pos = wpos.map(|e| e.div_euclid(chunk_size));

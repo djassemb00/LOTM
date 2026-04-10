@@ -17,3 +17,4 @@ vek = { workspace = true }
 glam = { workspace = true }
 specs = { workspace = true }
 hashbrown = { workspace = true }
+rand = { workspace = true }

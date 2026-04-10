@@ -2,12 +2,13 @@
 
 use winit::event::{ElementState, KeyEvent, MouseButton};
 use winit::keyboard::KeyCode;
+use std::collections::HashSet;
 
 /// Input state
 pub struct InputState {
-    pub keys_pressed: std::collections::HashSet<KeyCode>,
+    pub keys_pressed: HashSet<KeyCode>,
     pub mouse_position: (f64, f64),
-    pub mouse_buttons: std::collections::HashSet<MouseButton>,
+    pub mouse_buttons: HashSet<MouseButton>,
     pub touch_input: Option<TouchInput>,
 }
 
@@ -21,20 +22,20 @@ pub struct TouchInput {
 impl InputState {
     pub fn new() -> Self {
         Self {
-            keys_pressed: std::collections::HashSet::new(),
+            keys_pressed: HashSet::new(),
             mouse_position: (0.0, 0.0),
-            mouse_buttons: std::collections::HashSet::new(),
+            mouse_buttons: HashSet::new(),
             touch_input: None,
         }
     }
 
-    pub fn handle_key(&mut self, key: KeyEvent, state: ElementState) {
+    pub fn handle_key(&mut self, key: &KeyCode, state: ElementState) {
         match state {
             ElementState::Pressed => {
-                self.keys_pressed.insert(key.logical_key.clone().into());
+                self.keys_pressed.insert(*key);
             }
             ElementState::Released => {
-                // Remove from pressed
+                self.keys_pressed.remove(key);
             }
         }
     }
