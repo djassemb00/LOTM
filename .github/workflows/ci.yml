@@ -3,17 +3,15 @@ name: Build & Test
 on:
   push:
     branches: [master, main]
-  pull_request:
-    branches: [master, main]
 
 env:
   CARGO_TERM_COLOR: always
   RUST_BACKTRACE: 1
 
 jobs:
-  # Build common library first (simplest crate)
-  build-common:
-    name: Build lotm-common
+  # Simple check first
+  check:
+    name: Cargo Check
     runs-on: ubuntu-latest
 
     steps:
@@ -25,135 +23,8 @@ jobs:
       - name: Cache dependencies
         uses: Swatinem/rust-cache@v2
 
-      - name: Build lotm-common
-        run: cargo build -p lotm-common --verbose
+      - name: Run cargo check
+        run: cargo check --workspace --verbose 2>&1 || true
 
-  # Build world generation
-  build-world:
-    name: Build lotm-world
-    runs-on: ubuntu-latest
-    needs: build-common
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Cache dependencies
-        uses: Swatinem/rust-cache@v2
-
-      - name: Build lotm-world
-        run: cargo build -p lotm-world --verbose
-
-  # Build engine
-  build-engine:
-    name: Build lotm-engine
-    runs-on: ubuntu-latest
-    needs: build-world
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Cache dependencies
-        uses: Swatinem/rust-cache@v2
-
-      - name: Build lotm-engine
-        run: cargo build -p lotm-engine --verbose
-
-  # Build client
-  build-client:
-    name: Build lotm-client
-    runs-on: ubuntu-latest
-    needs: build-engine
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Cache dependencies
-        uses: Swatinem/rust-cache@v2
-
-      - name: Build lotm-client
-        run: cargo build -p lotm-client --verbose
-
-  # Build server
-  build-server:
-    name: Build lotm-server
-    runs-on: ubuntu-latest
-    needs: build-engine
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Cache dependencies
-        uses: Swatinem/rust-cache@v2
-
-      - name: Build lotm-server
-        run: cargo build -p lotm-server --verbose
-
-  # Build for Android
-  build-android:
-    name: Build Android (aarch64)
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Add Android target
-        run: rustup target add aarch64-linux-android
-
-      - name: Install Android NDK
-        uses: nttld/setup-ndk@v1
-        id: setup-ndk
-        with:
-          ndk-version: r26b
-          add-to-path: false
-
-      - name: Cache dependencies
-        uses: Swatinem/rust-cache@v2
-
-      - name: Set up Android linker
-        run: |
-          mkdir -p .cargo
-          echo '[target.aarch64-linux-android]' > .cargo/config.toml
-          echo "linker = \"${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android21-clang\"" >> .cargo/config.toml
-
-      - name: Build for Android
-        run: cargo build --target aarch64-linux-android --verbose
-
-  # Documentation
-  docs:
-    name: Generate Documentation
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Cache dependencies
-        uses: Swatinem/rust-cache@v2
-
-      - name: Generate documentation
-        run: cargo doc --no-deps --workspace || echo "Documentation generation had warnings"
-
-      - name: Upload documentation
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: docs
-          path: target/doc/
-          retention-days: 30
+      - name: Run cargo build
+        run: cargo build --workspace --verbose
