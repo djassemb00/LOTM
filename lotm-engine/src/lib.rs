@@ -5,3 +5,4 @@
 pub mod ecs;
 pub mod events;
 pub mod time;
+pub mod atmosphere;

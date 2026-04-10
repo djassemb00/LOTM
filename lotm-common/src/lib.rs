@@ -5,6 +5,7 @@
 pub mod math;
 pub mod types;
 pub mod error;
+pub mod beyonder;
 
 // Re-exports
 pub use vek;
