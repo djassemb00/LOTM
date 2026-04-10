@@ -1,0 +1,184 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+
+jobs:
+  # Create release on GitHub
+  create-release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+    
+    steps:
+      - name: Create Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          draft: true
+          generate_release_notes: true
+
+  # Build and upload Linux binaries
+  release-linux:
+    name: Release Linux
+    needs: create-release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+      
+      - name: Cache dependencies
+        uses: Swatinem/rust-cache@v2
+      
+      - name: Build release
+        run: cargo build --release --verbose
+      
+      - name: Package client
+        run: |
+          mkdir -p release
+          cp target/release/lotm-client release/
+          cp target/release/lotm-server release/
+          cp README.md release/
+          cp LICENSE release/ 2>/dev/null || true
+          cd release
+          tar czf ../lotm-linux-x86_64.tar.gz *
+      
+      - name: Upload client binary
+        uses: softprops/action-gh-release@v1
+        with:
+          files: lotm-linux-x86_64.tar.gz
+
+  # Build and upload Windows binaries
+  release-windows:
+    name: Release Windows
+    needs: create-release
+    runs-on: windows-latest
+    permissions:
+      contents: write
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+      
+      - name: Cache dependencies
+        uses: Swatinem/rust-cache@v2
+      
+      - name: Build release
+        run: cargo build --release --verbose
+      
+      - name: Package client
+        run: |
+          mkdir release
+          Copy-Item target/release/lotm-client.exe release/
+          Copy-Item target/release/lotm-server.exe release/
+          Copy-Item README.md release/
+          cd release
+          7z a ../lotm-windows-x86_64.zip *
+      
+      - name: Upload client binary
+        uses: softprops/action-gh-release@v1
+        with:
+          files: lotm-windows-x86_64.zip
+
+  # Build and upload macOS binaries
+  release-macos:
+    name: Release macOS
+    needs: create-release
+    runs-on: macos-latest
+    permissions:
+      contents: write
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+      
+      - name: Cache dependencies
+        uses: Swatinem/rust-cache@v2
+      
+      - name: Build release
+        run: cargo build --release --verbose
+      
+      - name: Package client
+        run: |
+          mkdir -p release
+          cp target/release/lotm-client release/
+          cp target/release/lotm-server release/
+          cp README.md release/
+          cp LICENSE release/ 2>/dev/null || true
+          cd release
+          tar czf ../lotm-macos-x86_64.tar.gz *
+      
+      - name: Upload client binary
+        uses: softprops/action-gh-release@v1
+        with:
+          files: lotm-macos-x86_64.tar.gz
+
+  # Build and upload Android APK
+  release-android:
+    name: Release Android
+    needs: create-release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+      
+      - name: Add Android target
+        run: rustup target add aarch64-linux-android
+      
+      - name: Install Android NDK
+        uses: nttld/setup-ndk@v1
+        id: setup-ndk
+        with:
+          ndk-version: r26b
+          add-to-path: false
+      
+      - name: Cache dependencies
+        uses: Swatinem/rust-cache@v2
+      
+      - name: Set up Android linker
+        run: |
+          mkdir -p .cargo
+          cat > .cargo/config.toml << EOF
+          [target.aarch64-linux-android]
+          linker = "${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android21-clang"
+          ar = "${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ar"
+          EOF
+      
+      - name: Build for Android
+        run: cargo build --target aarch64-linux-android --release --verbose
+      
+      - name: Package Android library
+        run: |
+          mkdir -p release-android
+          cp target/aarch64-linux-android/release/liblotm_client.so release-android/ 2>/dev/null || true
+          cp target/aarch64-linux-android/release/lotm-client release-android/ 2>/dev/null || true
+          cd release-android
+          tar czf ../lotm-android-aarch64.tar.gz *
+      
+      - name: Upload Android binary
+        uses: softprops/action-gh-release@v1
+        with:
+          files: lotm-android-aarch64.tar.gz
