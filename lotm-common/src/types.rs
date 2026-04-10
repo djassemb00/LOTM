@@ -56,7 +56,7 @@ impl BlockKind {
 pub struct Chunk {
     pub position: CPos,
     pub blocks: Vec<BlockKind>,
-    pub entities: Vec<EntityId>,
+    pub entities: Vec<u64>,
 }
 
 impl Chunk {
@@ -105,7 +105,3 @@ impl Chunk {
             + pos.x as usize
     }
 }
-
-/// Entity identifier
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
-pub struct EntityId(pub u64);
