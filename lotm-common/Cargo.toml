@@ -5,5 +5,4 @@ version.workspace = true
 edition.workspace = true
 
 [dependencies]
-vek = { workspace = true }
 serde = { workspace = true }
