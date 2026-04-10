@@ -11,9 +11,9 @@ env:
   RUST_BACKTRACE: 1
 
 jobs:
-  # Build on Linux (PC)
-  build-linux:
-    name: Build Linux (PC)
+  # Build common library first (simplest crate)
+  build-common:
+    name: Build lotm-common
     runs-on: ubuntu-latest
 
     steps:
@@ -22,24 +22,17 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y pkg-config libssl-dev libxcb1-dev libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev
-
       - name: Cache dependencies
         uses: Swatinem/rust-cache@v2
 
-      - name: Build all crates
-        run: cargo build --verbose
+      - name: Build lotm-common
+        run: cargo build -p lotm-common --verbose
 
-      - name: Build release
-        run: cargo build --release --verbose
-
-  # Build on Windows
-  build-windows:
-    name: Build Windows
-    runs-on: windows-latest
+  # Build world generation
+  build-world:
+    name: Build lotm-world
+    runs-on: ubuntu-latest
+    needs: build-common
 
     steps:
       - uses: actions/checkout@v4
@@ -50,16 +43,14 @@ jobs:
       - name: Cache dependencies
         uses: Swatinem/rust-cache@v2
 
-      - name: Build all crates
-        run: cargo build --verbose
+      - name: Build lotm-world
+        run: cargo build -p lotm-world --verbose
 
-      - name: Build release
-        run: cargo build --release --verbose
-
-  # Build on macOS
-  build-macos:
-    name: Build macOS
-    runs-on: macos-latest
+  # Build engine
+  build-engine:
+    name: Build lotm-engine
+    runs-on: ubuntu-latest
+    needs: build-world
 
     steps:
       - uses: actions/checkout@v4
@@ -70,11 +61,44 @@ jobs:
       - name: Cache dependencies
         uses: Swatinem/rust-cache@v2
 
-      - name: Build all crates
-        run: cargo build --verbose
+      - name: Build lotm-engine
+        run: cargo build -p lotm-engine --verbose
 
-      - name: Build release
-        run: cargo build --release --verbose
+  # Build client
+  build-client:
+    name: Build lotm-client
+    runs-on: ubuntu-latest
+    needs: build-engine
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache dependencies
+        uses: Swatinem/rust-cache@v2
+
+      - name: Build lotm-client
+        run: cargo build -p lotm-client --verbose
+
+  # Build server
+  build-server:
+    name: Build lotm-server
+    runs-on: ubuntu-latest
+    needs: build-engine
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache dependencies
+        uses: Swatinem/rust-cache@v2
+
+      - name: Build lotm-server
+        run: cargo build -p lotm-server --verbose
 
   # Build for Android
   build-android:
@@ -108,9 +132,6 @@ jobs:
 
       - name: Build for Android
         run: cargo build --target aarch64-linux-android --verbose
-
-      - name: Build Android release
-        run: cargo build --target aarch64-linux-android --release
 
   # Documentation
   docs:
