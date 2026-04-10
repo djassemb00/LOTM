@@ -15,27 +15,24 @@ jobs:
   build-linux:
     name: Build Linux (PC)
     runs-on: ubuntu-latest
-    
+
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
-        with:
-          components: rustfmt, clippy
-      
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pkg-config libssl-dev libxcb1-dev libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev
+
       - name: Cache dependencies
         uses: Swatinem/rust-cache@v2
-      
-      - name: Format code (auto-fix)
-        run: cargo fmt --all
-      
-      - name: Run Clippy (allow warnings)
-        run: cargo clippy -- -W clippy::all || true
-      
+
       - name: Build all crates
         run: cargo build --verbose
-      
+
       - name: Build release
         run: cargo build --release --verbose
 
@@ -43,19 +40,19 @@ jobs:
   build-windows:
     name: Build Windows
     runs-on: windows-latest
-    
+
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
-      
+
       - name: Cache dependencies
         uses: Swatinem/rust-cache@v2
-      
+
       - name: Build all crates
         run: cargo build --verbose
-      
+
       - name: Build release
         run: cargo build --release --verbose
 
@@ -63,19 +60,19 @@ jobs:
   build-macos:
     name: Build macOS
     runs-on: macos-latest
-    
+
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
-      
+
       - name: Cache dependencies
         uses: Swatinem/rust-cache@v2
-      
+
       - name: Build all crates
         run: cargo build --verbose
-      
+
       - name: Build release
         run: cargo build --release --verbose
 
@@ -83,55 +80,55 @@ jobs:
   build-android:
     name: Build Android (aarch64)
     runs-on: ubuntu-latest
-    
+
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
-      
+
       - name: Add Android target
         run: rustup target add aarch64-linux-android
-      
+
       - name: Install Android NDK
         uses: nttld/setup-ndk@v1
         id: setup-ndk
         with:
           ndk-version: r26b
           add-to-path: false
-      
+
       - name: Cache dependencies
         uses: Swatinem/rust-cache@v2
-      
+
       - name: Set up Android linker
         run: |
           mkdir -p .cargo
           echo '[target.aarch64-linux-android]' > .cargo/config.toml
           echo "linker = \"${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android21-clang\"" >> .cargo/config.toml
-      
+
       - name: Build for Android
-        run: cargo build --target aarch64-linux-android --verbose || echo "Android build skipped due to dependencies"
-      
+        run: cargo build --target aarch64-linux-android --verbose
+
       - name: Build Android release
-        run: cargo build --target aarch64-linux-android --release || echo "Android release build skipped"
+        run: cargo build --target aarch64-linux-android --release
 
   # Documentation
   docs:
     name: Generate Documentation
     runs-on: ubuntu-latest
-    
+
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
-      
+
       - name: Cache dependencies
         uses: Swatinem/rust-cache@v2
-      
+
       - name: Generate documentation
         run: cargo doc --no-deps --workspace || echo "Documentation generation had warnings"
-      
+
       - name: Upload documentation
         if: always()
         uses: actions/upload-artifact@v4
