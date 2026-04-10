@@ -8,13 +8,10 @@ edition.workspace = true
 lotm-common = { path = "../lotm-common" }
 lotm-world = { path = "../lotm-world" }
 
-wgpu = { workspace = true }
-winit = { workspace = true }
 tokio = { workspace = true }
 tracing = { workspace = true }
 serde = { workspace = true }
 vek = { workspace = true }
 glam = { workspace = true }
-specs = { workspace = true }
 hashbrown = { workspace = true }
 rand = { workspace = true }

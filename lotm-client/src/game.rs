@@ -1,10 +1,11 @@
 //! Main game state and loop.
 
 use anyhow::Result;
+use crate::camera::Camera;
 
 pub struct Game {
-    // Game state
     running: bool,
+    camera: Camera,
 }
 
 impl Game {
@@ -13,6 +14,7 @@ impl Game {
 
         Ok(Self {
             running: true,
+            camera: Camera::new(),
         })
     }
 
@@ -25,18 +27,22 @@ impl Game {
 
             // Render
             self.render().await?;
+
+            // Small delay to prevent busy loop
+            tokio::time::sleep(tokio::time::Duration::from_millis(16)).await;
         }
 
         Ok(())
     }
 
     async fn update(&mut self) -> Result<()> {
-        // Update game state
+        // Update camera
+        self.camera.update(glam::Vec3::new(0.0, 0.0, 0.0));
         Ok(())
     }
 
     async fn render(&mut self) -> Result<()> {
-        // Render frame
+        // Render frame (placeholder)
         Ok(())
     }
 }

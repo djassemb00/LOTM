@@ -1,28 +1,76 @@
-//! ECS (Entity Component System) integration.
+//! ECS (Entity Component System) - simplified implementation.
 
-use specs::*;
+use std::collections::HashMap;
 
-/// World ECS dispatcher
+/// Simple ECS world
 pub struct EcsWorld {
-    pub world: World,
+    entities: HashMap<u64, Entity>,
+    next_id: u64,
 }
 
 impl EcsWorld {
     pub fn new() -> Self {
-        let mut world = World::new();
+        Self {
+            entities: HashMap::new(),
+            next_id: 0,
+        }
+    }
 
-        // Register common components
-        world.register::<Position>();
-        world.register::<Velocity>();
-        world.register::<Rotation>();
+    /// Create a new entity
+    pub fn create_entity(&mut self) -> EntityId {
+        let id = EntityId(self.next_id);
+        self.next_id += 1;
+        self.entities.insert(self.next_id - 1, Entity::new());
+        id
+    }
 
-        Self { world }
+    /// Get entity by ID
+    pub fn get_entity(&self, id: EntityId) -> Option<&Entity> {
+        self.entities.get(&id.0)
+    }
+
+    /// Get mutable entity by ID
+    pub fn get_entity_mut(&mut self, id: EntityId) -> Option<&mut Entity> {
+        self.entities.get_mut(&id.0)
+    }
+}
+
+impl Default for EcsWorld {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Entity ID
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub struct EntityId(pub u64);
+
+/// Entity with components
+#[derive(Debug, Clone)]
+pub struct Entity {
+    pub position: Option<Position>,
+    pub velocity: Option<Velocity>,
+    pub rotation: Option<Rotation>,
+}
+
+impl Entity {
+    pub fn new() -> Self {
+        Self {
+            position: None,
+            velocity: None,
+            rotation: None,
+        }
+    }
+}
+
+impl Default for Entity {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
 /// Position component
-#[derive(Debug, Clone, Component)]
-#[storage(VecStorage)]
+#[derive(Debug, Clone)]
 pub struct Position {
     pub x: f32,
     pub y: f32,
@@ -30,8 +78,7 @@ pub struct Position {
 }
 
 /// Velocity component
-#[derive(Debug, Clone, Component)]
-#[storage(VecStorage)]
+#[derive(Debug, Clone)]
 pub struct Velocity {
     pub x: f32,
     pub y: f32,
@@ -39,8 +86,7 @@ pub struct Velocity {
 }
 
 /// Rotation component
-#[derive(Debug, Clone, Component)]
-#[storage(VecStorage)]
+#[derive(Debug, Clone)]
 pub struct Rotation {
     pub yaw: f32,
     pub pitch: f32,

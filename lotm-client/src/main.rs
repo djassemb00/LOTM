@@ -6,8 +6,6 @@ use tracing_subscriber::EnvFilter;
 
 mod game;
 mod camera;
-mod input;
-mod renderer;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
