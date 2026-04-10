@@ -1,0 +1,25 @@
+[package]
+name = "lotm-server"
+description = "Server application for LOTM multiplayer"
+version.workspace = true
+edition.workspace = true
+
+[[bin]]
+name = "lotm-server"
+path = "src/main.rs"
+
+[dependencies]
+lotm-common = { path = "../lotm-common" }
+lotm-world = { path = "../lotm-world" }
+lotm-engine = { path = "../lotm-engine" }
+
+tokio = { workspace = true }
+quinn = { workspace = true }
+async-trait = { workspace = true }
+futures-util = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+serde = { workspace = true }
+bincode = { workspace = true }
+hashbrown = { workspace = true }
+rayon = { workspace = true }

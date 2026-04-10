@@ -1,0 +1,27 @@
+[package]
+name = "lotm-world"
+description = "Procedural world generation for LOTM"
+version.workspace = true
+edition.workspace = true
+
+[features]
+default = ["simd"]
+simd = ["vek/platform_intrinsics"]
+
+[dependencies]
+lotm-common = { path = "../lotm-common" }
+lotm-assets = { path = "../lotm-assets" }
+
+noise = { workspace = true }
+rand = { workspace = true }
+rand_chacha = { workspace = true }
+vek = { workspace = true }
+serde = { workspace = true }
+bincode = { workspace = true }
+ron = { workspace = true }
+rayon = { workspace = true }
+hashbrown = { workspace = true }
+lazy_static = { workspace = true }
+tracing = { workspace = true }
+enum-map = { workspace = true }
+strum = { workspace = true }

@@ -1,0 +1,74 @@
+[workspace]
+resolver = "2"
+members = [
+    "lotm-common",
+    "lotm-world",
+    "lotm-client",
+    "lotm-server",
+    "lotm-engine",
+    "lotm-assets",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+license = "GPL-3.0-or-later"
+description = "Lord of the Mysteries - Open World RPG"
+repository = "https://github.com/djassemb00/LOTM"
+
+[workspace.dependencies]
+# Mathematics
+vek = { version = "0.17", features = ["serde", "mint"] }
+glam = "0.29"
+
+# Noise & Procedural Generation
+noise = "0.9"
+rand = "0.10"
+rand_chacha = "0.10"
+
+# Async & Networking
+tokio = { version = "1.44", features = ["full"] }
+quinn = "0.11"
+async-trait = "0.1"
+futures-util = "0.3"
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+bincode = { version = "2", features = ["serde"] }
+ron = "0.12"
+
+# ECS
+specs = { version = "0.20", features = ["serde"] }
+
+# Graphics
+wgpu = "27"
+winit = "0.30"
+
+# Logging & Tracing
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# Parallelism
+rayon = "1.5"
+hashbrown = "0.16"
+
+# Utility
+lazy_static = "1.4"
+enum-map = "2.4"
+strum = { version = "0.28", features = ["derive"] }
+thiserror = "2"
+anyhow = "1.0"
+
+# Android Support
+ndk = "0.9"
+ndk-context = "0.1"
+
+[profile.dev]
+opt-level = 1
+debug = true
+
+[profile.release]
+opt-level = 3
+lto = true
+strip = true

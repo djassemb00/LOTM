@@ -1,0 +1,11 @@
+[package]
+name = "lotm-assets"
+description = "Asset management for LOTM"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+serde = { workspace = true }
+ron = { workspace = true }
+tracing = { workspace = true }
+anyhow = { workspace = true }

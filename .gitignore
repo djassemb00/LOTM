@@ -1,0 +1,29 @@
+# Build artifacts
+/target/
+**/*.rs.bk
+*.pdb
+Cargo.lock
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Assets (large files should be tracked with git-lfs)
+lotm-assets/**/*.png
+lotm-assets/**/*.jpg
+lotm-assets/**/*.wav
+lotm-assets/**/*.ogg
+
+# Environment
+.env
+.env.local
+
+# Maps (generated)
+maps/

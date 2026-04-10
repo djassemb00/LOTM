@@ -1,0 +1,23 @@
+[package]
+name = "lotm-client"
+description = "Client application for LOTM"
+version.workspace = true
+edition.workspace = true
+
+[[bin]]
+name = "lotm-client"
+path = "src/main.rs"
+
+[dependencies]
+lotm-common = { path = "../lotm-common" }
+lotm-world = { path = "../lotm-world" }
+lotm-engine = { path = "../lotm-engine" }
+
+wgpu = { workspace = true }
+winit = { workspace = true }
+tokio = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+serde = { workspace = true }
+vek = { workspace = true }
+glam = { workspace = true }

@@ -1,0 +1,19 @@
+[package]
+name = "lotm-engine"
+description = "Core engine for LOTM game systems"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+lotm-common = { path = "../lotm-common" }
+lotm-world = { path = "../lotm-world" }
+
+wgpu = { workspace = true }
+winit = { workspace = true }
+tokio = { workspace = true }
+tracing = { workspace = true }
+serde = { workspace = true }
+vek = { workspace = true }
+glam = { workspace = true }
+specs = { workspace = true }
+hashbrown = { workspace = true }
